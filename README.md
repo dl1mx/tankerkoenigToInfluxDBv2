@@ -1,5 +1,5 @@
 # tankerkoenigToInfluxDB
-Small script that pulls gas prices from Tankerkönig and writes them into an InfluxDB
+Small script that pulls gas prices from Tankerkönig and writes them into an InfluxDB v2
 
 ## Requirements
 
