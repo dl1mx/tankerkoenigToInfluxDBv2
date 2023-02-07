@@ -11,16 +11,17 @@
 
 import requests
 import json
-from influxdb import InfluxDBClient
+from influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import SYNCHRONOUS
 import os
 from os.path import exists
 
 config = {
     "influxHost" : "",
     "influxPort" : 8086,
-    "influxUsername" : "",
-    "influxPassword" : "",
-    "influxDatabase" : "",
+    "influxToken" : "",
+    "influxOrg" : "",
+    "influxBucket" : "",
     "influxMeasurement" : "",
     "influxStationIdTagName" : "",
     "tankerkoenigApikey" : "",
@@ -33,7 +34,8 @@ if exists(configFile) :
     with open(configFile, "r") as f:
         config.update({k:v for k,v in json.loads(f.read()).items()})
 
-client = InfluxDBClient(config['influxHost'], config['influxPort'], config['influxUsername'], config['influxPassword'], config['influxDatabase'])
+client = InfluxDBClient(url=config['influxHost']+":"+str(config['influxPort']), token=config['influxToken'], org=config['influxOrg'])
+write_api = client.write_api(write_options=SYNCHRONOUS)
 PRICES_API_URL = "https://creativecommons.tankerkoenig.de/json/prices.php"
 
 
@@ -90,7 +92,7 @@ def writePrices (jsonData):
     print()
     print("INFLUX INSERT JSON BODY: {0}".format(json_body))
     print()
-  client.write_points(json_body)
+  write_api.write(bucket=config['influxBucket'], record=json_body)
 
 # Creating two-dimensional array with stations
 
